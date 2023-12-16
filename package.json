@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start":"node server.js",
+    "start":"node index.js",
     "dev":"nodemon server.js",
 
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin":{
+    "execute":"index.js"
   },
   "author": "",
   "license": "ISC",
