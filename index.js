@@ -1,18 +1,33 @@
-const express=require('express');
-const app=express();
-const cors=require('cors');
-const ObjectId=require('mongodb');
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const ObjectId = require('mongodb');
 require('./db/config')
-const User=require("./db/User");
-const Product=require("./db/Product")
+const User = require("./db/User");
+const Product = require("./db/Product")
 app.use(express.json());
 app.use(cors())
 const jwt = require('jsonwebtoken');
-const jwtKey="e-commerceByAvinash"
+const jwtKey = "e-commerceByAvinash"
 app.get("/",verifyToken, async(req,resp)=>{
-        const list=await Product.find();
-        resp.send(list);
+  console.log("dksjlkfjsdlk")
+  try{
+    const list=await Product.find();
+    console.log("iske baad")
+    resp.send(list);
+  }catch(error){
+      resp.send("error aa rhah ")
+  }
+        
 
+})
+app.get("/users",verifyToken,async(req,resp)=>{
+  try{
+ const users=await User.find();
+   resp.send(users);
+  }catch(error){
+   resp.send("galat connect ho gya");
+  }
 })
 function verifyToken(req,resp,next){
   //  let token=req.headers['authorization'];
@@ -38,7 +53,7 @@ function verifyToken(req,resp,next){
 }
 
 app.post("/product",async (req,resp)=>{
-       
+
         let product=new Product(req.body);
         let result=await product.save();
         result=result.toObject();
@@ -59,7 +74,7 @@ app.post("/register", async (req,resp)=>{
 
 })
 app.post("/login",async (req,resp)=>{
-   
+
   try{
     let user=await User.findOne(req.body).select("-password");
     if(user){
@@ -78,7 +93,7 @@ app.post("/login",async (req,resp)=>{
   } catch(error){
     res.status(500).json({ error: 'Internal server error' });
   }
-  
+
 })
 app.get("/search/:productId", async (req, res) => {
         console.log("avinash")
@@ -86,7 +101,7 @@ app.get("/search/:productId", async (req, res) => {
       console.log(productId)
         try {
           const product = await Product.findOne({ _id: productId});
-    
+
           if (product) {
             res.json(product);
           } else {
@@ -154,13 +169,14 @@ app.listen(5000)
 
 // async function fetchHtml(url) {
 //   try {
-//     const response = await axios.get(url,{
+//     const response = await axios.get(url, {
 //       headers: {
-//           'Content-Type': 'text/html; charset=UTF-8',
-//           'Accept-Language':'en-US'
+//         'Content-Type': 'text/html; charset=UTF-8',
+//         'Accept-Language': 'en-US'
 //       }
-//   });
-//   console.log(response.data);
+//     });
+
+
 //     return response.data;
 //   } catch (error) {
 //     throw new Error(`Error fetching HTML from ${url}: ${error.message}`);
@@ -176,53 +192,106 @@ app.listen(5000)
 //   tableRows.each((index, row) => {
 //     const columns = $(row).find('td, th');
 //     const rowData = [];
-
+//     let hrefContent = '';
 //     columns.each((colIndex, column) => {
+
+//       let anchoreElement = $(column).find('a');
+//       if (anchoreElement.length > 0) {
+//         hrefContent = 'https://www.timeanddate.com'
+//         hrefContent += anchoreElement.attr('href');
+
+//       }
 //       rowData.push($(column).text().trim());
 //     });
 
+//     if (rowData.length > 0&&hrefContent!='') {
+//       rowData.push(hrefContent)
+//     }
 //     tableData.push(rowData);
 //   });
 //   return tableData;
 
 // }
 
-// // Function to write data to a CSV file
-// // Function to write data to a CSV file
-// // Function to write data to a CSV file
 // function writeToCsv(data, csvFilePath) {
 //   if (data.length === 0) {
 //     console.error('No data to write to CSV.');
 //     return;
 //   }
-  
+//   data[0].push('url');
+//   data[0].push('Holiday year');
+//   data[0].push('country');
+//   data[0].push('url1');
+//   data[0].push('url2');
+//   data[0].push('Region');
+//   data[0].push('Importance');
+//   data[0].push('Description');
+//   data[0].push('ImpactID')
+
 //   const csvWriter = createCsvWriter({
 //     path: csvFilePath,
-//     header: data[0].map((_, index) => ({ id: `column${index + 1}`, title: `Column ${index + 1}` })),
+//     header: data[0].map((_, index) => ({ id: `column${index + 1}` })),
 //   });
 
 //   const records = data.map(row => row.reduce((acc, value, index) => {
+
 //     acc[`column${index + 1}`] = value;
 //     return acc;
 //   }, {}));
 //   // console.log(records)
 //   return csvWriter.writeRecords(records);
 // }
-
-
-
 // async function main() {
 //   try {
-//     const html = await fetchHtml(url);
-//     const tableData = extractTableData(html);
+//     let countryArray = ['india', 'singapore']
+//     let yeararray = [2023, 2024, 2025];
+//     let mainTable = [];
+//     for (let y = 0; y < 2; y++) {
+//       for (let i = 0; i < 3; i++) {
+//         let url = `https://www.timeanddate.com/holidays/${countryArray[y]}/${yeararray[i]}`;
+//         const html = await fetchHtml(url);
+//         const tableData = extractTableData(html);
+//         for (let j = 0; j < tableData.length; j++) {
 
-//     if (tableData.length === 0) {
-//       console.error('No table data found.');
+//           if (tableData[j].length != 0) {
+
+//             if (j != 0) {
+//               tableData[j].push(yeararray[i]);
+//               tableData[j].push(countryArray[y]);
+//               tableData[j].push(`https://www.timeanddate.com/holidays/${countryArray[y]}`)
+//               tableData[j].push(`https://www.timeanddate.com/holidays/${countryArray[y]}/${yeararray[i]}`)
+//               tableData[j].push(null);
+//               tableData[j].push('N/a');
+//               tableData[j].push(null);
+//               tableData[j].push(5);
+//               // tableData[j].push(url);
+//             }
+
+//             if (j == 0) {
+//               if (y == 0 && i == 0) {
+//                 mainTable.push(tableData[j]);
+//               }
+//             }
+//             else {
+//               mainTable.push(tableData[j]);
+//             }
+
+
+//           }
+
+//         }
+//       }
+//     }
+
+
+
+//     if (mainTable.length === 0) {
+//       console.error('No table data found');
 //       return;
 //     }
- 
+
 //     const csvFilePath = 'output.csv';
-//     await writeToCsv(tableData, csvFilePath);
+//     await writeToCsv(mainTable, csvFilePath);
 
 //     console.log(`CSV file created successfully at: ${csvFilePath}`);
 //   } catch (error) {
